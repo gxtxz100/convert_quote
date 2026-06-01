@@ -1,0 +1,7 @@
+{
+  "default_output_suffix": "_converted",
+  "recursive": true,
+  "backup_original": false,
+  "supported_extensions": [".md", ".markdown", ".docx"],
+  "log_level": "info"
+}

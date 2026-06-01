@@ -1,0 +1,3 @@
+# 文档引号转换工具依赖
+# 处理 Word 文档需要安装 python-docx
+python-docx>=0.8.11

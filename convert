@@ -1,0 +1,6 @@
+#!/bin/bash
+# 文档引号转换工具 - 启动脚本
+# 将此脚本放到 PATH 中，即可在任何位置调用
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+python3 "${SCRIPT_DIR}/convert_quotes.py" "$@"
