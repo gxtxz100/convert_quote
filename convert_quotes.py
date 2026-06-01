@@ -117,55 +117,63 @@ def process_markdown_file(file_path, output_path=None):
         return False
 
 
+def process_paragraph_runs(paragraph):
+    """
+    处理段落中的所有 run，保留格式信息
+    Word 文档中的格式是以 run 为单位存储的，直接修改 paragraph.text 会丢失格式
+    """
+    for run in paragraph.runs:
+        if run.text:
+            run.text = convert_quotes_in_text(run.text)
+
+
 def process_docx_file(file_path, output_path=None):
     """处理 Word (docx) 文件"""
     try:
         from docx import Document
-        
+
         # 打开文档
         doc = Document(file_path)
-        
-        # 处理段落
+
+        # 处理段落 - 在 run 级别修改以保留格式
         for paragraph in doc.paragraphs:
-            if paragraph.text:
-                paragraph.text = convert_quotes_in_text(paragraph.text)
-        
+            process_paragraph_runs(paragraph)
+
         # 处理表格
         for table in doc.tables:
             for row in table.rows:
                 for cell in row.cells:
-                    if cell.text:
-                        cell.text = convert_quotes_in_text(cell.text)
-        
+                    # 处理单元格中的每个段落
+                    for paragraph in cell.paragraphs:
+                        process_paragraph_runs(paragraph)
+
         # 处理页眉
         for section in doc.sections:
             header = section.header
             for paragraph in header.paragraphs:
-                if paragraph.text:
-                    paragraph.text = convert_quotes_in_text(paragraph.text)
-            
+                process_paragraph_runs(paragraph)
+
             # 处理页脚
             footer = section.footer
             for paragraph in footer.paragraphs:
-                if paragraph.text:
-                    paragraph.text = convert_quotes_in_text(paragraph.text)
-        
+                process_paragraph_runs(paragraph)
+
         # 确定输出路径
         if output_path is None:
             file_path_obj = Path(file_path)
             output_path = file_path_obj.parent / f"{file_path_obj.stem}_converted{file_path_obj.suffix}"
-        
+
         # 保存文档
         doc.save(output_path)
-        
+
         print(f"✓ Word 文件处理成功: {file_path} -> {output_path}")
         return True
-        
+
     except ImportError:
         print(f"✗ 处理 Word 文件需要安装 python-docx 库")
         print(f"  请运行: pip install python-docx")
         return False
-        
+
     except Exception as e:
         print(f"✗ Word 文件处理失败: {file_path}")
         print(f"  错误: {e}")
